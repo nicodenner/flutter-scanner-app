@@ -1,1 +1,1 @@
-# flutter-scanner-app
+# My first Flutter app
