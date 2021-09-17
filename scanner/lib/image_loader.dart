@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart' as Path;
 import 'package:image/image.dart' as Img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -51,4 +51,11 @@ Future<List<File>> loadAllImagesFromDirectory() async {
 void deleteImage(String path) {
   final dir = Directory(path);
   dir.deleteSync(recursive: true);
+}
+
+void renameImage(String path, String newFileName) {
+  String dir = Path.dirname(path);
+  String newPath = Path.join(dir, "$newFileName.jpg");
+  File file = File(path);
+  file.renameSync(newPath);
 }
