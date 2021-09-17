@@ -1,16 +1,18 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:image/image.dart' as Img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<File> saveImageToDisk(Map arguments) async {
+Future<Directory> directory = getApplicationDocumentsDirectory();
+
+Future<File> saveImageToDisk(String path, String name) async {
   try {
-    String path = arguments["path"];
-    Directory directory = arguments["directory"];
+    Directory dir = await directory;
     File tempFile = File(path);
     Img.Image? image = Img.decodeImage(tempFile.readAsBytesSync());
     String imgType = path.split('.').last;
-    String mPath = '${directory.path.toString()}/${DateTime.now()}.$imgType';
+    String mPath = '${dir.path.toString()}/$name.$imgType';
     File dFile = File(mPath);
     if (imgType == '.jpg' || imgType == '.jpeg'){
       dFile.writeAsBytesSync(Img.encodeJpg(image!));
@@ -24,16 +26,29 @@ Future<File> saveImageToDisk(Map arguments) async {
   }
 }
 
-Future<File> loadImage(ImageSource imageSource) async {
+Future<File> loadImageFromSource(ImageSource imageSource) async {
   ImagePicker _imagePicker = ImagePicker();
   PickedFile? file = await _imagePicker.getImage(source: imageSource);
-  File mFile = File('');
   if (file != null) {
-    Directory directory = await getApplicationDocumentsDirectory();
-    Map arguments = Map();
-    arguments["path"] = file.path;
-    arguments["directory"] = directory;
-    mFile = await saveImageToDisk(arguments);
+    return File(file.path);
   }
-  return mFile;
+  else {
+    return File("");
+  }
+}
+
+Future<List<File>> loadAllImagesFromDirectory() async {
+  Directory dir = await directory;
+  List<File> images = [];
+  await for (var entity in dir.list()) {
+    if (entity.path.endsWith(".jpg")) {
+    images.add(File(entity.path));
+    };
+  }
+  return images;
+}
+
+void deleteImage(String path) {
+  final dir = Directory(path);
+  dir.deleteSync(recursive: true);
 }

@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:scanner/image_loader.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:scanner/preview_screen.dart';
+import 'package:scanner/scan_history.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -15,11 +16,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Image> images = [];
 
-
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,9 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("Welcome to the Scanner App"),
         backgroundColor: Colors.teal,
       ),
-      body: Center(
-        child:Column(),
-      ),
+      body: ScanHistory(),
       floatingActionButton: SpeedDial(
           icon: Icons.add,
           backgroundColor: Colors.teal,
@@ -54,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> load_and_preview(ImageSource imagesource) async {
-    File image = await loadImage(imagesource);
+    File image = await loadImageFromSource(imagesource);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => PreviewScreen(image)),

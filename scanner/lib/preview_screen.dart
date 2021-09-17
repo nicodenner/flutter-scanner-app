@@ -39,9 +39,4 @@ class _PreviewScreenState extends State<PreviewScreen> {
       ),
     );
   }
-
-  Future<File> getImage() async{
-    File img = await widget.image;
-    return img;
-  }
 }
