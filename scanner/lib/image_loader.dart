@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:path/path.dart' as Path;
 import 'package:image/image.dart' as Img;
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart' as image_picker;
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 /// Current working directory of the app
-Future<Directory> directory = getApplicationDocumentsDirectory();
+Future<Directory> directory = path_provider.getApplicationDocumentsDirectory();
 
 /// Saves file, located at [path], at the current working directory.
 ///
@@ -19,9 +19,7 @@ Future<File> saveImageToDisk(String path, String name) async {
     String imgType = path.split('.').last;
     String mPath = '${dir.path.toString()}/$name.$imgType';
     File dFile = File(mPath);
-    if (imgType == '.jpg' || imgType == '.jpeg'){
-      dFile.writeAsBytesSync(Img.encodeJpg(image!));
-    }
+    dFile.writeAsBytesSync(Img.encodeJpg(image!));
     return dFile;
   }catch(e){
     return File("");
@@ -30,13 +28,15 @@ Future<File> saveImageToDisk(String path, String name) async {
 
 /// Loads image from [imageSource].
 ///
-/// Use 'ImageSource.camera' for loading image from camera.
-/// Use 'ImageSource.gallery' for loading image from gallery.
-Future<File> loadImageFromSource(ImageSource imageSource) async {
-  ImagePicker _imagePicker = ImagePicker();
-  PickedFile? file = await _imagePicker.getImage(source: imageSource);
+/// Use 'image_picker.ImageSource.camera' for loading image from camera.
+/// Use 'image_picker.ImageSource.gallery' for loading image from gallery.
+Future<File> loadImageFromSource(image_picker.ImageSource imageSource) async {
+  image_picker.ImagePicker _imagePicker = image_picker.ImagePicker();
+  image_picker.PickedFile? file = await _imagePicker.getImage(source: imageSource);
   if (file != null) {
-    return File(file.path);
+    //todo remove following line if saving should happen after editing and not after picking image
+    File dFile = await saveImageToDisk(file.path, DateTime.now().toString());
+    return File(dFile.path);
   }
   else {
     return File("");

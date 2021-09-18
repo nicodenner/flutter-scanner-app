@@ -1,19 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:scanner/image_loader.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:scanner/preview_screen.dart';
-import 'package:scanner/scan_history.dart';
+import 'package:image_picker/image_picker.dart' as image_picker;
+import 'package:scanner/image_loader.dart' as image_loader;
+import 'package:flutter_speed_dial/flutter_speed_dial.dart' as flutter_speed_dial;
+import 'package:scanner/preview_screen.dart' as preview_screen;
+import 'package:scanner/scan_history.dart' as scan_history;
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class ScannerHomeScreen extends StatefulWidget {
+  const ScannerHomeScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _ScannerHomeScreenState createState() => _ScannerHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _ScannerHomeScreenState extends State<ScannerHomeScreen> {
   List<Image> images = [];
 
   @override
@@ -28,35 +28,36 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("Welcome to the Scanner App"),
         backgroundColor: Colors.teal,
       ),
-      body: ScanHistory(),
-      floatingActionButton: SpeedDial(
+      body: scan_history.ScanHistory(),
+      floatingActionButton: flutter_speed_dial.SpeedDial(
           icon: Icons.add,
           backgroundColor: Colors.teal,
           children: [
-            SpeedDialChild(
+            flutter_speed_dial.SpeedDialChild(
               child: Icon(Icons.camera_alt_outlined),
               label: 'Camera',
               backgroundColor: Colors.teal,
               onTap: () {
-                load_and_preview(ImageSource.camera);},
+                load_and_preview(image_picker.ImageSource.camera);},
             ),
-            SpeedDialChild(
+            flutter_speed_dial.SpeedDialChild(
               child: Icon(Icons.picture_in_picture_outlined),
               label: 'Gallery',
               backgroundColor: Colors.teal,
               onTap: () {
-                load_and_preview(ImageSource.gallery);},
+                load_and_preview(image_picker.ImageSource.gallery);},
             ),
           ]
       ),
     );
   }
 
-  Future<void> load_and_preview(ImageSource imagesource) async {
-    File image = await loadImageFromSource(imagesource);
+  /// Loads image from [imageSource] and previews it in new tab.
+  Future<void> load_and_preview(image_picker.ImageSource imagesource) async {
+    File image = await image_loader.loadImageFromSource(imagesource);
     Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PreviewScreen(image)),
-    );
+        context,
+        MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(image)))
+        .then((_) => setState(() {}));
   }
 }
