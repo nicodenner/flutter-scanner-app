@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:scanner/preview_screen.dart';
+import 'package:scanner/preview_screen.dart' as preview_screen;
+import 'package:scanner/text_form_dialog.dart' as text_form_dialog;
+import 'image_loader.dart' as image_loader;
 
-import 'image_loader.dart';
-
+/// Widget listing all the scans of the user.
 class ScanHistory extends StatefulWidget {
   const ScanHistory({Key? key}) : super(key: key);
 
@@ -18,10 +19,12 @@ class _ScanHistoryState extends State<ScanHistory> {
   @override
   void initState() {
     super.initState();
+    reLoadImages();
   }
 
   @override
   Widget build(BuildContext context) {
+    reLoadImages();
     return FutureBuilder(
         future: reLoadImages(),
         builder: (BuildContext context,
@@ -37,6 +40,10 @@ class _ScanHistoryState extends State<ScanHistory> {
     );
   }
 
+  /// Creates a new list element.
+  ///
+  /// It contains a mini preview and details about [file].
+  /// It allows the user to modify [file] e.g. deleting, renaming...
   Widget createListElement(File file) {
     String filename = file.path.split('/').last;
     return ListTile(
@@ -48,91 +55,52 @@ class _ScanHistoryState extends State<ScanHistory> {
       trailing: _imageOptions(file),
       onTap: () {Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => PreviewScreen(file)));},
+    MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(file)));},
       contentPadding: EdgeInsets.all(8.0),
     );
   }
 
+  /// Reloads all images from the current working directory.
   Future<void> reLoadImages() async {
-    scans = await loadAllImagesFromDirectory();
+    scans = await image_loader.loadAllImagesFromDirectory();
   }
 
+  /// Widget containg the [file] modification options.
   Widget _imageOptions(File file) {
     return PopupMenuButton(
       onSelected: (value) async {
         if (value == "preview") {
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PreviewScreen(file)));
+              MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(file)))
+              .then((_) => setState(() {}));
         }
         if (value == "delete") {
-          deleteImage(file.path);
+          image_loader.deleteImage(file.path);
         }
         if (value == "rename") {
-          await showTextDialog(context);
-          String newName = _textEditingController.text;
-          renameImage(file.path, newName);
+          await text_form_dialog.showTextDialog(context);
+          String newName = text_form_dialog.getUserInput();
+          image_loader.renameImage(file.path, newName);
         }
         setState(
                 () {reLoadImages();}
         );
       },
       itemBuilder: (context) => [
-        PopupMenuItem(
+        const PopupMenuItem(
           child: Text("Preview"),
           value: "preview",
         ),
-        PopupMenuItem(
+        const PopupMenuItem(
           child: Text("Rename"),
           value: "rename",
         ),
-        PopupMenuItem(
+        const PopupMenuItem(
           child: Text("Delete"),
           value: "delete",
         ),
       ]
     );
   }
-}
-
-
-///TextFormDialog
-GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-TextEditingController _textEditingController = TextEditingController();
-String userInput = "";
-
-Future<void> showTextDialog(BuildContext context) async{
-  return await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: _textEditingController,
-                  validator: (value) {
-                    return (value != "") ? null: "Empty Field";
-                  },
-                  decoration: InputDecoration(
-                      hintText: "Enter New Name"
-                  ),
-                )],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child:Text("Save"),
-              onPressed: () {
-                if(_formKey.currentState!.validate()) {
-                  userInput = _textEditingController.text;
-                  Navigator.of(context).pop();
-                }
-              },
-            )
-          ],
-        );
-      });
 }
