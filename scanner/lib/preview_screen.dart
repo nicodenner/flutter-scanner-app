@@ -51,15 +51,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
               label: 'blue_threshold',
               backgroundColor: Colors.blueAccent,
               onTap: () {
-                Future getImage() async {
-                  var image =
-                      await Img_PP.ImgProcessor().aug_black(widget.image);
-
-                  setState(() {
-                    widget.image = image;
-                  });
-                }
-                getImage();
+                Img_PP.ImgProcessor().augBlue(widget.image);
               },
             ),
             flutter_speed_dial.SpeedDialChild(

@@ -55,7 +55,8 @@ class _ScanHistoryState extends State<ScanHistory> {
       trailing: _imageOptions(file),
       onTap: () {Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(file)));},
+    MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(file)))
+          .then((_) => setState(() {}));},
       contentPadding: EdgeInsets.all(8.0),
     );
   }
