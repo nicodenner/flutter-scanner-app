@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart' as image_picker;
-import 'package:scanner/image_loader.dart' as image_loader;
 import 'package:flutter_speed_dial/flutter_speed_dial.dart' as flutter_speed_dial;
+import 'package:scanner/image_loader.dart' as image_loader;
 import 'package:scanner/preview_screen.dart' as preview_screen;
 import 'package:scanner/scan_history.dart' as scan_history;
 
