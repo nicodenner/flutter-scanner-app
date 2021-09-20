@@ -65,9 +65,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
             flutter_speed_dial.SpeedDialChild(
               child: Icon(Icons.brush),
               label: 'greed_threshold',
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.white,
               onTap: () {
-                // call post processing method
+                Img_PP.ImgProcessor().augWhite(widget.image);// call post processing method
               },
             ),
           ]),
