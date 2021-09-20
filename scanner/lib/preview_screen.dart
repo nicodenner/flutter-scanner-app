@@ -59,7 +59,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
               label: 'red_threshold',
               backgroundColor: Colors.red,
               onTap: () {
-                // call post processing method
+                Img_PP.ImgProcessor().augRed(widget.image);
               },
             ),
             flutter_speed_dial.SpeedDialChild(
