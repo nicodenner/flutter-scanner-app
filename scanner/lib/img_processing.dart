@@ -1,103 +1,90 @@
-import 'dart:io' as IO;
 import 'package:image/image.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:scanner/image_loader.dart' as img_loader;
 
+enum AugColor {red, green, blue, white, black}
 
+/// Returns a function that receives the values for r, g, b and evaluates if
+/// color augmentation for [color] is needed.
+///
+/// Returns a function so other implementations of the Threshold evaluation are easily
+/// integrable.
+Function evalThresh (AugColor color){
+  int threshRed = 0;
+  int threshGreen = 0;
+  int threshBlue = 0;
 
-
-
-
-class ImgProcessor{
-  static int counter = 0; // counter to prevent overwrite.
-  // image_loader.loadAllImagesFromDirectory() doesn't reload pics with same name even though content changed
-
-  Future<void> augBlue(IO.File input_file) async{
-    var imageFile = input_file.readAsBytesSync();
-    // decodeImage can identify the format of the image and
-    // decode the image accordingly
-    final image = decodeImage(imageFile)!;
-    final new_pic =  brightness(image, 100)!;
-    IO.Directory temp_dir = await img_loader.directory;
-    String filename = input_file.path.split('/').last;
-    filename = filename.split('.').first;
-    IO.File(temp_dir.path +'/' + filename + '_${counter.toString()}_Edit.jpg').writeAsBytesSync(encodeJpg(new_pic));
-    counter = counter + 1;
+  switch (color){
+    case AugColor.red:
+      threshRed = 125;
+      threshGreen = 95;
+      threshBlue = 95;
+      return (int red, int green, int blue) {
+        return (red > threshRed && green < threshGreen && blue < threshBlue);
+      };
+    case AugColor.green:
+      threshRed = 45;
+      threshGreen = 60;
+      threshBlue = 45;
+      return (int red, int green, int blue) {
+        return (red < threshRed && green > threshGreen && blue < threshBlue);
+      };
+    case AugColor.blue:
+      threshRed = 50;
+      threshGreen = 50;
+      threshBlue = 75;
+      return (int red, int green, int blue) {
+        return (red < threshRed && green < threshGreen && blue > threshBlue);
+      };
+    case AugColor.white:
+      threshRed = 135;
+      threshGreen = 135;
+      threshBlue = 135;
+      return (int red, int green, int blue) {
+        return (red > threshRed && green > threshGreen && blue > threshBlue);
+      };
+    case AugColor.black:
+      threshRed = 75;
+      threshGreen = 75;
+      threshBlue = 75;
+      return (int red, int green, int blue) {
+        return (red < threshRed && green < threshGreen && blue < threshBlue);
+      };
   }
+}
 
-  Future<void> augRed(IO.File input_file) async{
-    var imageFile = input_file.readAsBytesSync();
-    // decodeImage can identify the format of the image and
-    // decode the image accordingly
-    final image = decodeImage(imageFile)!;
-    Image edit_img = Image.from(image);       //make editable copy of img
-    for (var x = 0; x < image.width; ++x){
-      for (var y = 0; y < image.height; ++y){
-        var pxl = image.getPixel(x, y);
-        var red  = getRed(pxl);
-        var green = getGreen(pxl);
-        var blue  = getBlue(pxl);
-        if (red > 140 && blue < 120 && green < 120){
-          //check if the red channel is above a certain threshold and blue and green
-          // below a threshold. If so set the pixel to maximum red and other channels to 0.
-          edit_img.setPixelRgba(x, y, 255, 0, 0);
-        }
+Function mainColorSetter (Image img, AugColor mainColor){
+  switch (mainColor){
+    case AugColor.red:
+      return (int x, int y) => img.setPixelRgba(x, y, 255, 0, 0);
+    case AugColor.green:
+      return (int x, int y) => img.setPixelRgba(x, y, 0, 255, 0);
+    case AugColor.blue:
+      return (int x, int y) => img.setPixelRgba(x, y, 0, 0, 255);
+    case AugColor.white:
+      return (int x, int y) => img.setPixelRgba(x, y, 255, 255, 255);
+    case AugColor.black:
+      return (int x, int y) => img.setPixelRgba(x, y, 0, 0, 0);
+  }
+}
+
+Image fAugColor(Image inImg, AugColor color){
+  Image editImg = Image.from(inImg);       //make editable copy of img
+  Function setMainColor = mainColorSetter(editImg, color);
+  Function evalColor = evalThresh(color);
+
+  // goes through each pixel in every row and every column
+  for (var x = 0; x < inImg.width; ++x) {
+    for (var y = 0; y < inImg.height; ++y) {
+      var pxl = inImg.getPixel(x, y);
+      int red = getRed(pxl);
+      int green = getGreen(pxl);
+      int blue = getBlue(pxl);
+
+      if (evalColor(red, green, blue)) {
+        //check if the red channel is above a certain threshold and blue and green
+        // below a threshold. If so set the pixel to maximum red and other channels to 0.
+        setMainColor(x,y);
       }
     }
-
-    //final new_pic =  brightness(image, 100)!;
-    IO.Directory temp_dir = await img_loader.directory;
-    String filename = input_file.path.split('/').last;
-    filename = filename.split('.').first;
-    IO.File(temp_dir.path +'/' + filename + '_${counter.toString()}_Edit.jpg').writeAsBytesSync(encodeJpg(edit_img));
-    counter = counter + 1;
   }
-
-  Future<void> augWhite(IO.File input_file) async{
-    var imageFile = input_file.readAsBytesSync();
-    // decodeImage can identify the format of the image and
-    // decode the image accordingly
-    final image = decodeImage(imageFile)!;
-    Image edit_img = Image.from(image);       //make editable copy of img
-    for (var x = 0; x < image.width; ++x){
-      for (var y = 0; y < image.height; ++y){
-        var pxl = image.getPixel(x, y);
-        var red  = getRed(pxl);
-        var green = getGreen(pxl);
-        var blue  = getBlue(pxl);
-        if (red > 160 && blue > 160 && green > 150){
-          //check if the red channel is above a certain threshold and blue and green
-          // below a threshold. If so set the pixel to maximum red and other channels to 0.
-          edit_img.setPixelRgba(x, y, 255, 255, 255);
-        }
-      }
-    }
-
-    //final new_pic =  brightness(image, 100)!;
-    IO.Directory temp_dir = await img_loader.directory;
-    String filename = input_file.path.split('/').last;
-    filename = filename.split('.').first;
-    IO.File(temp_dir.path +'/' + filename + '_${counter.toString()}_Edit.jpg').writeAsBytesSync(encodeJpg(edit_img));
-    counter = counter + 1;
-  }
-/*
-  Future<IO.File> aug_red(IO.File input_file) async{
-    var imageFile = input_file.readAsBytesSync();
-    // decodeImage can identify the format of the image and
-    // decode the image accordingly
-    final loadedImage = decodeImage(imageFile)!;
-    var image = loadedImage.clone();
-    for (var x; x < image.width; ++x){
-      for (var y; y < image.height; ++y){
-        var pxl = image.getPixel(x, y);
-
-      }
-    }
-    final new_pic =  brightness(image, 100)!;
-    //final newpic = copyResize(image, width: 120);
-    IO.Directory tempDir = await directory;
-    IO.File(tempDir.path + '/kitten.jpg').writeAsBytesSync(encodePng(new_pic));
-    return IO.File(tempDir.path + '/kitten.jpg');
-  }
-  */
+  return editImg;
 }
