@@ -37,7 +37,9 @@ class PreviewScreen extends StatefulWidget {
     if (await File(safePath).exists()) {
       await showAlertDialog(context, (){
         File(safePath).writeAsBytesSync(Img.encodeJpg(currentImgData!));
-      });
+      }, "Attention!",
+          "An edited version of this file already exist. "
+              "If you continue the existing file will be replaced.");
     }
     else {
       File(safePath).writeAsBytesSync(Img.encodeJpg(currentImgData!));
