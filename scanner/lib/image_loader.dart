@@ -35,7 +35,8 @@ Future<File> loadImageFromSource(image_picker.ImageSource imageSource) async {
   image_picker.PickedFile? file = await _imagePicker.getImage(source: imageSource);
   if (file != null) {
     //todo remove following line if saving should happen after editing and not after picking image
-    File dFile = await saveImageToDisk(file.path, DateTime.now().toString());
+    String imageName = DateTime.now().toString();
+    File dFile = await saveImageToDisk(file.path, imageName.substring(0, imageName.indexOf(".")));
     return File(dFile.path);
   }
   else {

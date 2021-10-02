@@ -59,7 +59,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Image Preview"),
+        title: Text(widget.source.path.split('/').last),
+        centerTitle: true,
         actions: <Widget>[
           edited == false     // if picture is not edited the safe button doesn't exist
               ? Container()
@@ -82,9 +83,11 @@ class _PreviewScreenState extends State<PreviewScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-            widget.source.path == ""
-                ? Container()
-                : Expanded(child: widget.imgWidgetFromData()),
+                Text("Last modified: " + widget.source.lastModifiedSync().toString().split(".").first),
+                Text("File size: " + (widget.source.lengthSync() / 1000000).toStringAsFixed(3).toString() + " MB"),
+                widget.source.path == ""
+                    ? Container()
+                    : Expanded(child: widget.imgWidgetFromData()),
           ])),
       floatingActionButton: flutter_speed_dial
           .SpeedDial(icon: Icons.edit, backgroundColor: Colors.teal, children: [
