@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart'
     as flutter_speed_dial;
 import 'package:scanner/alert_dialog.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:image/image.dart' as Img;
 import 'package:scanner/image_loader.dart' as Img_Loader;
 import 'package:scanner/img_processing.dart' as Img_PP;
@@ -64,6 +65,10 @@ class _PreviewScreenState extends State<PreviewScreen> {
         title: Text(widget.source.path.split('/').last),
         centerTitle: true,
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: (){Share.share("Komm in die Gruppe!");},
+          ),
           edited == false     // if picture is not edited the safe button doesn't exist
               ? Container()
               : IconButton(
