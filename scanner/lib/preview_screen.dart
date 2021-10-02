@@ -30,7 +30,7 @@ class PreviewScreen extends StatefulWidget {
     // build new filename and append "_Edit" to original name
     String filename = source.path.split('/').last;
     List<String> splitName = filename.split('.');
-    splitName.insert(splitName.length - 1, '_Edit');
+    splitName[0] = splitName[0] + '_Edit';
     filename = splitName.join(".");
     String safePath = localDir.path + '/' + filename;
 
@@ -129,7 +129,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
         ),
         flutter_speed_dial.SpeedDialChild(
           child: Icon(Icons.brush),
-          label: 'greed_threshold',
+          label: 'white_threshold',
           backgroundColor: Colors.white,
           onTap: () {
             widget.currentImgData =
