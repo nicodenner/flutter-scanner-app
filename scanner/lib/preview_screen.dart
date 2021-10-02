@@ -14,7 +14,9 @@ class PreviewScreen extends StatefulWidget {
   Img.Image? currentImgData;    // Don't mix up with Image Widget from material.dart
 
   PreviewScreen(this.source, {Key? key}) : super(key: key) {
-    currentImgData = Img.decodeImage(source.readAsBytesSync());
+    if (source.path != "") {
+      currentImgData = Img.decodeImage(source.readAsBytesSync());
+    }
     //displayImg = Image.file(source, filterQuality: FilterQuality.high);
   }
 
