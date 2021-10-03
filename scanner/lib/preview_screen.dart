@@ -67,7 +67,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.share),
-            onPressed: (){Share.share("Komm in die Gruppe!");},
+            onPressed: () {
+              Share.shareFiles([widget.source.path], text: 'Scan created with fabulous Scanner App');
+            }
           ),
           edited == false     // if picture is not edited the safe button doesn't exist
               ? Container()
@@ -90,8 +92,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-                Text("Last modified: " + widget.source.lastModifiedSync().toString().split(".").first),
                 Text("File size: " + (widget.source.lengthSync() / 1048576).toStringAsFixed(3).toString() + " MB"),
+                Text("Last modified: " + widget.source.lastModifiedSync().toString().split(".").first),
                 widget.source.path == ""
                     ? Container()
                     : Expanded(child: widget.imgWidgetFromData()),
