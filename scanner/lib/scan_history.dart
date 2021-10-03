@@ -54,6 +54,7 @@ class _ScanHistoryState extends State<ScanHistory> {
         // Remove the item from the data source.
         setState(() {
           image_loader.deleteImage(file.path);
+          //scans.remove(file);
         });
 
         // Then show a snackbar.
