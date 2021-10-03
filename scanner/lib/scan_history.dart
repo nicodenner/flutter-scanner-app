@@ -64,6 +64,7 @@ class _ScanHistoryState extends State<ScanHistory> {
   /// Reloads all images from the current working directory.
   Future<void> reLoadImages() async {
     scans = await image_loader.loadAllImagesFromDirectory();
+    scans.sort((a, b) => b.lastModifiedSync().toString().compareTo(a.lastModifiedSync().toString()));
   }
 
   /// Widget containg the [file] modification options.
