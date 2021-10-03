@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 ///Shows an AlertDialog with the options "Cancel" and "Continue".
 ///
 /// Does nothing on "Cancel" and does whatever is passed to [foo] on "Continue".
-Future<dynamic> showAlertDialog(BuildContext context, Function foo) async {
+Future<dynamic> showAlertDialog(BuildContext context, Function foo, String title, String msg) async {
   // set up the buttons
   Widget cancelButton = TextButton(
     child: Text("Cancel"),
@@ -25,8 +25,8 @@ Future<dynamic> showAlertDialog(BuildContext context, Function foo) async {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text("AlertDialog"),
-        content: Text("An edited Version if the File already exist. If you continue the existing file will be replaced."),
+        title: Text(title),
+        content: Text(msg),
         actions: [
           cancelButton,
           continueButton,

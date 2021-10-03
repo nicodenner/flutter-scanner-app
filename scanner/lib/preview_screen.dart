@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart'
     as flutter_speed_dial;
 import 'package:scanner/alert_dialog.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:image/image.dart' as Img;
 import 'package:scanner/image_loader.dart' as Img_Loader;
 import 'package:scanner/img_processing.dart' as Img_PP;
@@ -14,7 +15,9 @@ class PreviewScreen extends StatefulWidget {
   Img.Image? currentImgData;    // Don't mix up with Image Widget from material.dart
 
   PreviewScreen(this.source, {Key? key}) : super(key: key) {
-    currentImgData = Img.decodeImage(source.readAsBytesSync());
+    if (source.path != "") {
+      currentImgData = Img.decodeImage(source.readAsBytesSync());
+    }
     //displayImg = Image.file(source, filterQuality: FilterQuality.high);
   }
 
@@ -28,14 +31,16 @@ class PreviewScreen extends StatefulWidget {
     // build new filename and append "_Edit" to original name
     String filename = source.path.split('/').last;
     List<String> splitName = filename.split('.');
-    splitName.insert(splitName.length - 1, '_Edit');
+    splitName[0] = splitName[0] + '_Edit';
     filename = splitName.join(".");
     String safePath = localDir.path + '/' + filename;
 
     if (await File(safePath).exists()) {
       await showAlertDialog(context, (){
         File(safePath).writeAsBytesSync(Img.encodeJpg(currentImgData!));
-      });
+      }, "Attention!",
+          "An edited version of this file already exist. "
+              "If you continue the existing file will be replaced.");
     }
     else {
       File(safePath).writeAsBytesSync(Img.encodeJpg(currentImgData!));
@@ -60,6 +65,12 @@ class _PreviewScreenState extends State<PreviewScreen> {
         title: Text(widget.source.path.split('/').last),
         centerTitle: true,
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              Share.shareFiles([widget.source.path], text: 'Scan created with fabulous Scanner App');
+            }
+          ),
           edited == false     // if picture is not edited the safe button doesn't exist
               ? Container()
               : IconButton(
@@ -81,8 +92,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
+                Text("File size: " + (widget.source.lengthSync() / 1048576).toStringAsFixed(3).toString() + " MB"),
                 Text("Last modified: " + widget.source.lastModifiedSync().toString().split(".").first),
-                Text("File size: " + (widget.source.lengthSync() / 1000000).toStringAsFixed(3).toString() + " MB"),
                 widget.source.path == ""
                     ? Container()
                     : Expanded(child: widget.imgWidgetFromData()),
@@ -127,7 +138,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
         ),
         flutter_speed_dial.SpeedDialChild(
           child: Icon(Icons.brush),
-          label: 'greed_threshold',
+          label: 'white_threshold',
           backgroundColor: Colors.white,
           onTap: () {
             widget.currentImgData =

@@ -46,18 +46,39 @@ class _ScanHistoryState extends State<ScanHistory> {
   /// It allows the user to modify [file] e.g. deleting, renaming...
   Widget createListElement(File file) {
     String filename = file.path.split('/').last;
-    return ListTile(
-      leading: Image.file(
-        file,
-        alignment: Alignment.center,
+    return Dismissible(
+      // Each Dismissible must contain a Key. Keys allow Flutter to
+      // uniquely identify widgets.
+      key: Key(filename),
+      onDismissed: (direction) {
+        // Remove the item from the data source.
+        setState(() {
+          image_loader.deleteImage(file.path);
+        });
+
+        // Then show a snackbar.
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Scan dismissed')));
+      },
+      background: Container(color: Colors.red),
+      child: ListTile(
+        leading: Image.file(
+          file,
+          alignment: Alignment.center,
+        ),
+        title: Text(filename),
+        subtitle: Text(
+            (file.lengthSync() / 1048576).toStringAsFixed(3).toString() + " MB" +
+                " | " +
+                file.lastModifiedSync().toString().split(".").first
+        ),
+        trailing: _imageOptions(file),
+        onTap: () {Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(file)))
+            .then((_) => setState(() {}));},
+        contentPadding: EdgeInsets.all(8.0),
       ),
-      title: Text(filename),
-      trailing: _imageOptions(file),
-      onTap: () {Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(file)))
-          .then((_) => setState(() {}));},
-      contentPadding: EdgeInsets.all(8.0),
     );
   }
 

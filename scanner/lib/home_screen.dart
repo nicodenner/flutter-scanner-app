@@ -55,9 +55,12 @@ class _ScannerHomeScreenState extends State<ScannerHomeScreen> {
   /// Loads image from [imageSource] and previews it in new tab.
   Future<void> load_and_preview(image_picker.ImageSource imagesource) async {
     File image = await image_loader.loadImageFromSource(imagesource);
-    Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => preview_screen.PreviewScreen(image)))
-        .then((_) => setState(() {}));
+    if (image.path != "") {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => preview_screen.PreviewScreen(image)))
+          .then((_) => setState(() {}));
+    }
   }
 }
