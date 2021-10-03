@@ -86,7 +86,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Text("Last modified: " + widget.source.lastModifiedSync().toString().split(".").first),
-                Text("File size: " + (widget.source.lengthSync() / 1000000).toStringAsFixed(3).toString() + " MB"),
+                Text("File size: " + (widget.source.lengthSync() / 1048576).toStringAsFixed(3).toString() + " MB"),
                 widget.source.path == ""
                     ? Container()
                     : Expanded(child: widget.imgWidgetFromData()),
