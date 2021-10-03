@@ -52,6 +52,11 @@ class _ScanHistoryState extends State<ScanHistory> {
         alignment: Alignment.center,
       ),
       title: Text(filename),
+      subtitle: Text(
+          (file.lengthSync() / 1048576).toStringAsFixed(3).toString() + " MB" +
+          " | " +
+          file.lastModifiedSync().toString().split(".").first
+      ),
       trailing: _imageOptions(file),
       onTap: () {Navigator.push(
     context,
